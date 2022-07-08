@@ -3,3 +3,32 @@ $dark: #152B3C;
 $mid: #295074;
 $light: #3A668B;
 $very-light: #4380B1;
+$super-light: #2f98ee;
+
+
+.main-container{
+    display: flex;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-container{
+    padding: 2rem 1rem;
+    width: 100%;
+    min-height: 100vh;
+//     background-color: $dark;
+// //   background-image: linear-gradient(140deg, $super-light 0%,  $very-dark 15%,$super-light 95%);
+// background-size: cover;
+}
+
+.bg-image{
+  // filter: blur(2px);
+  position: absolute;
+  z-index: -1;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-image: linear-gradient(140deg, $mid 0%,  $very-dark 5%,$mid 95%);
+  transform: scale(1.1);
+}

@@ -4,24 +4,55 @@ import {GiHamburgerMenu} from 'react-icons/gi'
 import {IoMdBuild} from 'react-icons/io'
 import { AiOutlineSearch,AiOutlineShoppingCart,AiOutlineHeart,AiOutlineLogin,AiOutlineUserAdd,} from 'react-icons/ai'
 import { RiLogoutBoxFill} from 'react-icons/ri'
-import { useState } from 'react';
+import { useState ,useEffect} from 'react';
+
 import {MdOutlineAccountCircle} from 'react-icons/md'
 
-import {motion, useAnimation, AnimatePresence} from 'framer-motion'
+import {motion, useAnimation, AnimatePresence} from 'framer-motion/dist/framer-motion'
+import { NavLink } from 'react-router-dom';
+
 
 const Navbar = () => {
     const [navActive, setNavActive] = useState(false);
+    const [search, setSearch] = useState(null);
+    const [isSearchFocus, setIsSearchFocus] = useState(false);
+    const [searchRef, setSearchRef] = useState(null)
+
+
     const navbarAnimationControls = useAnimation();
     const authSectionAnimationControls = useAnimation();
+    
+ 
+
+    useEffect(() => {
+        setSearchRef(React.createRef());
+        
+    }, []);
 
 
-    const handleHamburgerClick = ()=>{
+    useEffect(()=> {
+        if(search){
+            setIsSearchFocus(true)
+        }
+        else{
+        setIsSearchFocus(false)
+        }
+    },[search])
+
+    const handleHamburgerClick = async ()=>{
+            handleWindowSize();
+            setNavActive(!navActive);
+
+       
+    }
+
+    const handleWindowSize = async() => {
         if(!navActive){
             if(window.innerWidth > 768){
                 navbarAnimationControls.start({width: '18%', transition: {duration: .3}})
             }
             else{
-                navbarAnimationControls.start({width: '100%', transition: {duration: .3}})
+                navbarAnimationControls.start({width: '100%', transition: {duration: .3}, position: 'absolute'})
             }
             authSectionAnimationControls.start({flexDirection: 'row',transition: {duration: .3}})
         }
@@ -30,17 +61,46 @@ const Navbar = () => {
             navbarAnimationControls.start({width: '5%', transition: {duration: .3}})
             }
             else{
-                navbarAnimationControls.start({width: '15%', transition: {duration: .3}})
+                navbarAnimationControls.start({width: '15%', transition: {duration: .3},position: 'sticky'})
                 
             }
             authSectionAnimationControls.start({ flexDirection: 'column',transition: {duration: .3}})
         }
-            setNavActive(!navActive);
-
-       
     }
 
 
+
+
+
+
+    window.addEventListener('resize',async ()=>{
+
+        if(!navActive){
+            if(window.innerWidth > 768){
+                navbarAnimationControls.start({width: '5%', transition: {duration: .3}})
+            }
+            else{
+                navbarAnimationControls.start({width: '15%', transition: {duration: .3},position: 'sticky'})
+            }
+        }
+        else{
+            if(window.innerWidth > 768){
+                navbarAnimationControls.start({width: '18%', transition: {duration: .3}})
+            }
+            else{
+                navbarAnimationControls.start({width: '100%', transition: {duration: .3}, position: 'absolute'})
+            }
+        }
+        
+    })
+   
+    
+    const handleSearchClicked = async () => {
+        if(!navActive){
+        await handleHamburgerClick();
+        searchRef.current.focus()
+    }
+}
 
     return (
         <>
@@ -66,7 +126,7 @@ const Navbar = () => {
             <div className="main-nav-section">
 
             {!navActive &&
-            <li className='icon-container icon-container-active'>
+            <li onClick={() => handleSearchClicked()} className='icon-container icon-container-active'>
                 <AiOutlineSearch  className='nav-icon '></AiOutlineSearch>
                 </li>
             }
@@ -79,60 +139,59 @@ const Navbar = () => {
                 <motion.input 
                 initial={{ width: '0%' }}
                 animate={{ width: '100%' }}
+                ref={searchRef} 
                 exit={{ width: '0%' }} 
-                className='search-input' type="text" placeholder='Search Products...'/>
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
+                className={`search-input ${isSearchFocus? 'focused': ''}`} type="text" placeholder='Search Products...'/>
                 </AnimatePresence>
                 }
             </li>
             }
-            <li className='icon-container'><IoMdBuild className='nav-icon'></IoMdBuild>
-            {navActive && 
-            <AnimatePresence>
-
-                <motion.h3 
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 exit={{ opacity: 0 }} 
-                className='nav-expanded-text'>Build</motion.h3>
-            </AnimatePresence>
-            }
-            </li>
-            <li className='icon-container'><AiOutlineShoppingCart className='nav-icon'>
-                </AiOutlineShoppingCart>{navActive &&
-                <AnimatePresence>
-
-                <motion.h3 
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 exit={{ opacity: 0 }} 
-                className='nav-expanded-text'>Cart</motion.h3>
-            </AnimatePresence>
-                
-                }
-                </li>
-            <li className='icon-container'><MdOutlineAccountCircle className='nav-icon'></MdOutlineAccountCircle>
-            {navActive &&
-        <AnimatePresence>
-            <motion.h3
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }} 
-            className='nav-expanded-text'>Profile</motion.h3>
-            </AnimatePresence>
-            }</li>
-            <li className='icon-container'><AiOutlineHeart className='nav-icon'></AiOutlineHeart>
-            {navActive &&
-            <AnimatePresence>
-
-            <motion.h3 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }} 
-            className='nav-expanded-text'>Bookmarks</motion.h3>
-            </AnimatePresence>
-
-            }
-            </li>
+            <NavLink to='/build' exact>
+                        <li className='icon-container'><IoMdBuild className='nav-icon'></IoMdBuild>{navActive &&
+                        <AnimatePresence>
+                        <motion.h3 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }} 
+                        className='nav-expanded-text'>Build</motion.h3>
+                        </AnimatePresence>
+                        }</li>
+                </NavLink>
+            <NavLink to='/cart' exact>
+                        <li className='icon-container'><AiOutlineShoppingCart className='nav-icon'></AiOutlineShoppingCart>{navActive &&
+                        <AnimatePresence>
+                        <motion.h3 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }} 
+                        className='nav-expanded-text'>Cart</motion.h3>
+                        </AnimatePresence>
+                        }</li>
+                </NavLink>
+                <NavLink to='/profile' exact>
+                        <li className='icon-container'><MdOutlineAccountCircle className='nav-icon'></MdOutlineAccountCircle>{navActive &&
+                        <AnimatePresence>
+                        <motion.h3 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }} 
+                        className='nav-expanded-text'>Profile</motion.h3>
+                        </AnimatePresence>
+                        }</li>
+                </NavLink>
+             <NavLink to='/bookmarks' exact>
+                        <li className='icon-container'><AiOutlineHeart className='nav-icon'></AiOutlineHeart>{navActive &&
+                        <AnimatePresence>
+                        <motion.h3 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }} 
+                        className='nav-expanded-text'>Bookmarks</motion.h3>
+                        </AnimatePresence>
+                        }</li>
+                </NavLink>
             </div>
 
             <motion.div   initial= {{flexDirection:'column'}} className="auth-nav-section" animate={authSectionAnimationControls}>
@@ -149,29 +208,32 @@ const Navbar = () => {
                             </AnimatePresence>                        
                         }</li>  }
             {true &&<>
-            <li className='icon-container'><AiOutlineLogin className='nav-icon'></AiOutlineLogin>{navActive &&
-             <AnimatePresence>
+                    <NavLink to='/login' exact>
+                        <li className='icon-container'><AiOutlineLogin className='nav-icon'></AiOutlineLogin>{navActive &&
+                        <AnimatePresence>
+                        <motion.h3 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }} 
+                        className='nav-expanded-text'>Login</motion.h3>
+                        </AnimatePresence>
+                        }</li>
+                    </NavLink>
 
-             <motion.h3 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }} 
-             className='nav-expanded-text'>Login</motion.h3>
-             </AnimatePresence>
-            }</li>
-            <li className='icon-container '><AiOutlineUserAdd className='nav-icon'></AiOutlineUserAdd>{navActive &&
-             <AnimatePresence>
-
-             <motion.h3 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }} 
-             className='nav-expanded-text'>Signup</motion.h3>
-             </AnimatePresence>
-            }</li></>
+                    <NavLink to='/signup' exact>
+                        <li className='icon-container'><AiOutlineUserAdd className='nav-icon'></AiOutlineUserAdd>{navActive &&
+                        <AnimatePresence>
+                        <motion.h3 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }} 
+                        className='nav-expanded-text'>Signup</motion.h3>
+                        </AnimatePresence>
+                        }</li>
+                    </NavLink></>
             }
             </motion.div>
-
+            
     </motion.ul>
     </>
     );

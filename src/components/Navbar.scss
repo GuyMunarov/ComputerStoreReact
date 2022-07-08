@@ -8,7 +8,7 @@
     justify-content: space-between;
     align-items: center;    
     height: 100vh;
-
+    z-index: 1000;
    
     background-color:$very-dark;
     
@@ -24,6 +24,7 @@
         color: #fff;
         font-size: 2rem;
         font-weight: 700;
+        margin-left: 1rem;
     }
     .main-nav-section{
         display: flex;
@@ -86,6 +87,9 @@
         display: flex;
         gap: .8rem;
         margin: 0 auto;
+        @media(max-width: 768px){
+            transform: translateX(-5%);
+        }
     }
     .container-search{
         position: relative;
@@ -125,24 +129,35 @@
             text-align: center;
         }
         &:focus{
+
+            &::placeholder{
+                color: transparent;
+            }
+
             padding: 1rem 1rem 1rem 2.5rem;
 
             outline: none;
             box-shadow: 0px 0px 50px -9px rgba(0,0,0,0.71)
             ;
+       
+        }
+        &.focused{
+
             &::placeholder{
-                display: none;
+                color: transparent;
             }
+
+            padding: 1rem 1rem 1rem 2.5rem;
+
+            outline: none;
+            box-shadow: 0px 0px 50px -9px rgba(0,0,0,0.71)
+            ;
+       
         }
     }
 
 
 
-    .active{
-        width: 18% !important;
-        justify-content: left;
-
-    }
 
     .profile-navbar{
         width: 100%;
@@ -157,6 +172,21 @@
         gap: 5px;
         text-align: center;
     }
+
+    a{
+        display: flex;
+        width: 100% !important;
+        text-decoration: none;
+    }
+
+
+    a.active{
+        .icon-container{
+            background-color: $dark;
+        }
+    }
+    
+    
 }
 
 
