@@ -4,11 +4,15 @@ import {motion, useAnimation, AnimatePresence} from 'framer-motion/dist/framer-m
 import {AiOutlineMail} from 'react-icons/ai'
 import {MdOutlineAccountCircle} from 'react-icons/md'
 import {RiLockPasswordLine} from 'react-icons/ri'
-import { Link } from 'react-router-dom'
-import { useState, useRef, useEffect } from 'react'
+import { Link, useHistory } from 'react-router-dom'
+import { useState, useRef, useEffect,useContext } from 'react'
 import {validatePassword, validateEmail} from '../../utils/Validations'
 import { useFetch } from '../../hooks/useFetch'
 import Loader from '../../components/Loader'
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext'
+
+
 
 export default function Signup() {
 
@@ -22,16 +26,31 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [passwordTouched, setPasswordTouched] = useState(false);
 
-  const {error, isPending, postData, data} = useFetch('http://localhost:5001/users/signup','POST')
+  const [isPending,setIsPending] = useState(false)
+  const [error,setError] = useState('')
+  const history = useHistory();
 
-  const handleFormSubmit = (e) => {
+  const {dispatch} = useContext(AuthContext)
+
+  const handleFormSubmit = async(e) => {
     e.preventDefault()
-     postData({fullName,email,password})
+    setIsPending(true);
+    setError('')
+    try{
+    const res = await axios.post('https://localhost:7009/api/users/register',{email,password,fullName})
+    localStorage.setItem('user',JSON.stringify(res.data));
+    dispatch({type: 'LOGIN',payload: res.data})
+    history.push('/')
+    }
+    catch(err){
+      console.log(err);
+      setError(err.message)
+    }
+    setIsPending(false)
   }
 
-  useEffect(() => {
-    console.log(data,error,isPending);
-  }, [data])
+
+
 
   const isFormValid = (e) =>{
     return validatePassword(password) && validateEmail(email) && fullName
@@ -42,7 +61,7 @@ export default function Signup() {
             exit={{ opacity: 0 }}  
             className='signup' >
             
-            <form onSubmit={(e) => handleFormSubmit(e)} className='signup-form'> 
+            <form onSubmit={handleFormSubmit} className='signup-form'> 
 
              <motion.div
               initial={{ opacity: 0 }}
@@ -102,7 +121,7 @@ export default function Signup() {
               value={password}
               
               />
-             {(!validatePassword(password) && passwordTouched) && <div className='error'>please provide a correct password (minimum eight characters,at least one special character)</div>}
+             {(!validatePassword(password) && passwordTouched) && <div className='error'>please provide a correct password (minimum eight characters,at least one number)</div>}
               <RiLockPasswordLine className={`form-icon ${(!validatePassword(password) && passwordTouched) && 'red-icon'}`}/>
               </motion.div>
 
@@ -112,7 +131,7 @@ export default function Signup() {
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
               className="form-button-container">
-              {error && <div className='server-error'>something went wrong</div>}
+              {error && <div className='server-error'>{error}</div>}
 
               <button 
                disabled = {!isFormValid() || isPending} 

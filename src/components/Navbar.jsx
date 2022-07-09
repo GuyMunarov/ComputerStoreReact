@@ -4,12 +4,13 @@ import {GiHamburgerMenu} from 'react-icons/gi'
 import {IoMdBuild} from 'react-icons/io'
 import { AiOutlineSearch,AiOutlineShoppingCart,AiOutlineHeart,AiOutlineLogin,AiOutlineUserAdd,} from 'react-icons/ai'
 import { RiLogoutBoxFill} from 'react-icons/ri'
-import { useState ,useEffect} from 'react';
+import { useState ,useEffect,useContext} from 'react';
 
-import {MdOutlineAccountCircle} from 'react-icons/md'
+import {MdOutlineAccountCircle,MdComputer} from 'react-icons/md'
 
 import {motion, useAnimation, AnimatePresence} from 'framer-motion/dist/framer-motion'
 import { NavLink } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'
 
 
 const Navbar = () => {
@@ -17,12 +18,16 @@ const Navbar = () => {
     const [search, setSearch] = useState(null);
     const [isSearchFocus, setIsSearchFocus] = useState(false);
     const [searchRef, setSearchRef] = useState(null)
-
+    const {user,dispatch} = useContext(AuthContext)
 
     const navbarAnimationControls = useAnimation();
     const authSectionAnimationControls = useAnimation();
     
- 
+
+    const logoutClicked = () => {
+        localStorage.removeItem('user')
+        dispatch({type: 'LOGOUT'})
+    }
 
     useEffect(() => {
         setSearchRef(React.createRef());
@@ -123,6 +128,7 @@ const Navbar = () => {
 
                 }<span onClick={handleHamburgerClick} className='hamburger-icon'><GiHamburgerMenu className='nav-icon'></GiHamburgerMenu> </span>
             </li>
+            {user && 
             <div className="main-nav-section">
 
             {!navActive &&
@@ -148,6 +154,18 @@ const Navbar = () => {
                 }
             </li>
             }
+            <NavLink to='/' exact>
+                        <li className='icon-container'><MdComputer className='nav-icon'></MdComputer>{navActive &&
+                        <AnimatePresence>
+                        <motion.h3 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }} 
+                        className='nav-expanded-text'>Products</motion.h3>
+                        </AnimatePresence>
+                        }</li>
+                </NavLink>
+
             <NavLink to='/build' exact>
                         <li className='icon-container'><IoMdBuild className='nav-icon'></IoMdBuild>{navActive &&
                         <AnimatePresence>
@@ -193,12 +211,18 @@ const Navbar = () => {
                         }</li>
                 </NavLink>
             </div>
-
+            }
             <motion.div   initial= {{flexDirection:'column'}} className="auth-nav-section" animate={authSectionAnimationControls}>
-            {false && 
-                        <li className='icon-container'><RiLogoutBoxFill className='nav-icon'></RiLogoutBoxFill>{navActive &&
+            {user && 
+                        <li onClick={logoutClicked} className='icon-container'><RiLogoutBoxFill className='nav-icon'></RiLogoutBoxFill>{navActive &&
 
                             <AnimatePresence>
+                            
+                            <motion.h3 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }} 
+                            className='nav-expanded-text'>{user.fullName}</motion.h3>
 
                             <motion.h3 
                             initial={{ opacity: 0 }}
@@ -207,7 +231,7 @@ const Navbar = () => {
                             className='nav-expanded-text'>Logout</motion.h3>
                             </AnimatePresence>                        
                         }</li>  }
-            {true &&<>
+            {!user &&<>
                     <NavLink to='/login' exact>
                         <li className='icon-container'><AiOutlineLogin className='nav-icon'></AiOutlineLogin>{navActive &&
                         <AnimatePresence>

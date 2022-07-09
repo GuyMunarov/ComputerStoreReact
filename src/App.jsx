@@ -10,15 +10,20 @@ import Cart from './pages/Cart/Cart';
 import Profile from './pages/Profile/Profile';
 
 import { AnimatePresence } from 'framer-motion/dist/framer-motion';
+import { useContext } from 'react';
+import { AuthContext } from './context/AuthContext';
+import Products from './pages/Products/Products';
 
 function App() {
 
   const location = useLocation();
-
+  const {user,authIsReady} = useContext(AuthContext);
   return (
+   
    <div className='main-container'>
     <div className='bg-image'></div>
-    <Navbar/>
+    {authIsReady&&(<>
+        <Navbar/>
     <div className='page-container'>
 
      <AnimatePresence> 
@@ -26,32 +31,45 @@ function App() {
         <Switch location={location} key={location.key}>
 
           <Route  path='/login'>
-            <Login/>
+          {!user && <Login/>}
+          {user && <Redirect to='/'/>}
           </Route>
 
           <Route  path='/signup'>
-            <Signup/>
+          {!user && <Signup/>}
+          {user && <Redirect to='/'/>}
           </Route>
 
           <Route  path='/bookmarks'>
-            <Bookmarks/>
+          {user && <Bookmarks/>}
+          {!user && <Redirect to='/login'/>}
           </Route>
 
-          <Route  path='/build'>
-            <Build/>
+          <Route exact path='/build'>
+          {user && <Build/>}
+          {!user && <Redirect to='/login'/>}
+          </Route>
+
+          <Route exact path='/'>
+          {user && <Products/>}
+          {!user && <Redirect to='/login'/>}
           </Route>
 
           <Route  path='/cart'>
-            <Cart/>
+          {user && <Cart/>}
+          {!user && <Redirect to='/login'/>}
           </Route>
           <Route  path='/profile'>
-            <Profile/>
+          {user && <Profile/>}
+          {!user && <Redirect to='/login'/>}
           </Route>
 
         </Switch>
       </AnimatePresence>
       </div>
-    </div>
+      </>
+  )}
+      </div>
     
   );
 }

@@ -1,10 +1,9 @@
 
-const format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
 
 
 export const validatePassword = (password) => {
     if(password){
-    return password.length > 8 && format.test(password)
+    return password.length > 8 && /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)
     }
     return false;
 }

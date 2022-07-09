@@ -26,6 +26,7 @@ export const useFetch = (url, method = "GET") => {
       try {
         const res = await fetch(url, { ...fetchOptions, signal: controller.signal })
         if(!res.ok) {
+          console.log(res)
           throw new Error(res.statusText)
         }
         const data = await res.json()
@@ -38,7 +39,7 @@ export const useFetch = (url, method = "GET") => {
           console.log("the fetch was aborted")
         } else {
           setIsPending(false)
-          setError('Could not fetch the data')
+          setError(err.message)
         }
       }
     }
